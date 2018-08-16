@@ -1,11 +1,6 @@
-package com.salaryrobot.strategy.example;
+package example;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.Comparator;
-import java.util.TreeSet;
 
 import net.osomahe.coinacrobat.api.exchange.entity.ExchangePair;
 import net.osomahe.coinacrobat.api.strategy.boundary.StrategyScript;
@@ -13,7 +8,6 @@ import net.osomahe.coinacrobat.api.strategy.entity.Language;
 import net.osomahe.coinacrobat.api.strategy.entity.LocalizedText;
 import net.osomahe.coinacrobat.api.strategy.entity.StrategyParam;
 import net.osomahe.coinacrobat.api.ticker.entity.Price;
-import net.osomahe.coinacrobat.api.ticker.entity.TimestampPrice;
 
 
 /**
@@ -23,169 +17,101 @@ import net.osomahe.coinacrobat.api.ticker.entity.TimestampPrice;
  */
 public class ValueAverigingMinMax extends StrategyScript {
 
-    public enum Behaviour {SHORT_TERM, NORMAL, LONG_TERM}
-
     private static final String KEY_POSITION = "position";
 
-    private static final String KEY_TRADE_EPOCH = "trade-epoch";
+    private static final String KEY_TRADE_NEXT_EPOCH = "trade-next-epoch";
 
-    private static final String KEY_TRADE_AMOUNT = "trade-amount";
+    private static final String KEY_TRADE_NEXT_AMOUNT = "trade-next-amount";
 
-    private static final String KEY_MIN_MAX_EPOCH = "min-max-epoch";
+    private double tradeMin = 6;
 
-    private static final String KEY_BEHAVIOUR = "behaviour";
-
-    private static final String KEY_MIN = "min";
-
-    private static final String KEY_MAX = "max";
+    private int period = 512;
 
     private ExchangePair exchangePair;
-
-    private Behaviour behaviour;
 
 
     @Override
     public void init() {
-        if (!storage.containsKey(KEY_TRADE_EPOCH) || !storage.containsKey(KEY_TRADE_AMOUNT)) {
-            storage.put(KEY_TRADE_EPOCH, ZonedDateTime.now().toEpochSecond() + "");
-            storage.put(KEY_TRADE_AMOUNT, 8 + "");
-        }
-        setMinMax();
-    }
-
-    private void setMinMax() {
-        Long epoch = Long.valueOf(storage.getOrDefault(KEY_MIN_MAX_EPOCH, ZonedDateTime.now().minusMonths(2).toEpochSecond()).toString());
-        ZonedDateTime zdtMinMax = Instant.ofEpochSecond(epoch).atZone(ZoneOffset.UTC);
-        ZonedDateTime zdtBorder = ZonedDateTime.now().minusMonths(1);
-        if (zdtBorder.isAfter(zdtMinMax) || !storage.containsKey(KEY_MIN) || !storage.containsKey(KEY_MIN) || behaviourIsChanged()) {
-            Duration duration = getDuration();
-            TreeSet<TimestampPrice> period = new TreeSet<>(new PriceComparator());
-            period.addAll(ticker.getLast(exchangePair, ZonedDateTime.now().minus(duration)));
-
-            storage.put(KEY_MIN_MAX_EPOCH, ZonedDateTime.now().toEpochSecond() + "");
-            storage.put(KEY_MIN, period.first().getBid().toString());
-            storage.put(KEY_MAX, period.last().getAsk().toString());
-            storage.put(KEY_BEHAVIOUR, behaviour.name());
-        }
-    }
-
-    /**
-     * Provides how long in the should robot search in past for min and max.
-     *
-     * @return
-     */
-    private Duration getDuration() {
-        if (behaviour.equals(Behaviour.SHORT_TERM)) {
-            return Duration.ofDays(90);
-        } else if (behaviour.equals(Behaviour.NORMAL)) {
-            return Duration.ofDays(200);
-        } else if (behaviour.equals(Behaviour.LONG_TERM)) {
-            return Duration.ofDays(400);
-        } else {
-            throw new IllegalStateException("Behaviour is not set or unknown value: " + behaviour);
-        }
-    }
-
-    /**
-     * Decides whether the behaviour is set or recently changed by the user.
-     *
-     * @return
-     */
-    private boolean behaviourIsChanged() {
-        if (!storage.containsKey(KEY_BEHAVIOUR)) {
-            return true;
-        }
-        Behaviour saved = Behaviour.valueOf(storage.get(KEY_BEHAVIOUR).toString());
-        return !saved.equals(behaviour);
     }
 
     @Override
     public void tick() {
-        init();
-
-        double paymentCurrency = wallet.getAvailable(exchangePair.getPaymentCurrency());
-        double commodity = wallet.getAvailable(exchangePair.getCommodity());
+        ZonedDateTime from = now.minusDays(period);
+        double priceMax = ticker.getMaximumAsk(exchangePair, from).getAsk() * 1.2;
+        double priceMin = ticker.getMinimumBid(exchangePair, from).getBid() * 0.8;
         Price price = ticker.getLatest(exchangePair);
-        double middlePrice = (price.getBid() + price.getAsk()) / 2;
-        double commodityInPaymentCurrency = commodity * middlePrice;
-        double totalInPaymentCurrency = commodityInPaymentCurrency + paymentCurrency;
+        double priceNow = (price.getAsk() + price.getBid()) / 2;
+        double percentageNow = (priceNow - priceMin) / (priceMax - priceMin);
 
-        double minPrice = Double.parseDouble(storage.get(KEY_MIN).toString());
-        double maxPrice = Double.parseDouble(storage.get(KEY_MAX).toString());
+        double usd = wallet.getAvailable(exchangePair.getPaymentCurrency());
+        double btc = wallet.getAvailable(exchangePair.getCommodity());
+        double btcInUsd = btc * price.getBid();
+        double total = usd + btcInUsd;
+        double percentageWallet = btcInUsd / total;
 
-        double position = Double.valueOf(storage.getOrDefault(KEY_POSITION, commodityInPaymentCurrency).toString());
-        double trend = (middlePrice - minPrice) / (maxPrice - minPrice); // 0 - buy all, 1 - sell everything
-        double target = totalInPaymentCurrency - (trend * totalInPaymentCurrency);
-        double step = getStep(totalInPaymentCurrency);
-
-        if (position < target) {
-            position += step;
+        double positionSaved = Double.valueOf(storage.getOrDefault(KEY_POSITION, btcInUsd).toString());
+        double positionStep = getPositionStep(total);
+        if (percentageNow > percentageWallet) {
+            storage.put(KEY_POSITION, String.valueOf(positionSaved + positionStep));
         } else {
-            position -= step;
-        }
-        storage.put(KEY_POSITION, position + "");
-
-        double tradeAmount = Double.parseDouble(storage.get(KEY_TRADE_AMOUNT).toString());
-        if (commodityInPaymentCurrency + tradeAmount < position) {
-            // buy
-            tradeAmount = position - commodityInPaymentCurrency;
-            if (tradeAmount > paymentCurrency) {
-                tradeAmount = paymentCurrency - 6;
-            }
-            if (tradeAmount > 6) {
-                trader.buyCommodity(exchangePair, tradeAmount / price.getAsk());
-
-                storage.put(KEY_TRADE_EPOCH, ZonedDateTime.now().toEpochSecond() + "");
-                storage.put(KEY_TRADE_AMOUNT, tradeAmount * 2 + "");
-            }
-        } else if (commodityInPaymentCurrency - tradeAmount > position) {
-            // sell
-            tradeAmount = commodityInPaymentCurrency - position;
-            if (tradeAmount > commodityInPaymentCurrency) {
-                tradeAmount = commodityInPaymentCurrency - 6;
-            }
-            if (tradeAmount > 6) {
-                trader.sellCommodity(exchangePair, tradeAmount / price.getBid());
-
-                storage.put(KEY_TRADE_EPOCH, ZonedDateTime.now().toEpochSecond() + "");
-                storage.put(KEY_TRADE_AMOUNT, tradeAmount * 2 + "");
-            }
-        } else {
-            ZonedDateTime zdt = Instant.ofEpochSecond(Long.parseLong(storage.get(KEY_TRADE_EPOCH).toString())).atZone(ZoneOffset.UTC);
-            if (zdt.plusDays(1).isAfter(ZonedDateTime.now())) {
-                // if there was no trade last 24 hours, lower the trade amount
-                storage.put(KEY_TRADE_EPOCH, ZonedDateTime.now().toEpochSecond() + "");
-                storage.put(KEY_TRADE_AMOUNT, (tradeAmount / 2 > 6 ? tradeAmount / 2 : 6) + "");
-            }
+            storage.put(KEY_POSITION, String.valueOf(positionSaved - positionStep));
         }
 
-        log.info("total_in_%s: %s", exchangePair.getPaymentCurrency().getCode(), totalInPaymentCurrency);
-        log.info("%s: %s", exchangePair.getPaymentCurrency().getCode(), paymentCurrency);
-        log.info(exchangePair.getCommodity().getCode() + ": " + commodity);
-        log.info("%s_in_%s: %s",
-                exchangePair.getCommodity().getCode(),
-                exchangePair.getPaymentCurrency().getCode(),
-                commodityInPaymentCurrency);
+        double tradeSize = getTradeSize();
+        if (positionSaved - btcInUsd > tradeSize && usd > tradeMin) {
+            // buying btc
+            tradeSize = positionSaved - btcInUsd;
+            if (tradeSize > usd) {
+                tradeSize = usd;
+            }
+            trader.buyCommodity(exchangePair, tradeSize / price.getAsk());
+            storage.put(KEY_TRADE_NEXT_EPOCH, String.valueOf(now.plusDays(1).toEpochSecond()));
+            storage.put(KEY_TRADE_NEXT_AMOUNT, String.valueOf(tradeSize * 2));
+        }
+        if (btcInUsd - positionSaved > tradeSize) {
+            // selling btc
+            tradeSize = btcInUsd - positionSaved;
+            trader.sellCommodity(exchangePair, tradeSize / price.getBid());
+            storage.put(KEY_TRADE_NEXT_EPOCH, String.valueOf(now.plusDays(1).toEpochSecond()));
+            storage.put(KEY_TRADE_NEXT_AMOUNT, String.valueOf(tradeSize * 2));
+        }
 
-        graphs.plot(String.format("total_in_%s", exchangePair.getPaymentCurrency().getCode()), totalInPaymentCurrency);
-        graphs.plot(exchangePair.getPaymentCurrency().getCode(), paymentCurrency);
-        graphs.plot(exchangePair.getCommodity().getCode(), commodity);
-        graphs.plot(String.format("%s_in_%s", exchangePair.getCommodity().getCode(), exchangePair.getPaymentCurrency().getCode()),
-                commodityInPaymentCurrency);
+        graphs.plot("position", positionSaved);
+        graphs.plot(String.format("total_in_%s", exchangePair.getPaymentCurrency().getCode()), total);
 
-        log.debug("minPrice: %s", minPrice);
-        log.debug("maxPrice: %s", maxPrice);
-        log.debug("position: %s", position);
-        log.debug("trend: %s", trend);
-        log.debug("target: %s", target);
-        log.debug("tradeAmount: %s", tradeAmount);
+        log.debug("priceMin: %s", priceMin);
+        log.debug("priceMax: %s", priceMax);
+        log.debug("priceNow: %s", priceNow);
+
+        log.debug("%s: %s", exchangePair.getPaymentCurrency().getCode(), usd);
+        log.debug("%s: %s", exchangePair.getCommodity().getCode(), btc);
+        log.debug("%s_in_%s: %s", exchangePair.getCommodity().getCode(), exchangePair.getPaymentCurrency().getCode(), btcInUsd);
+        log.debug("total_in_%s: %s", exchangePair.getPaymentCurrency().getCode(), total);
+
+        log.debug("percentageNow: %s", percentageNow);
+        log.debug("percentageWallet: %s", percentageWallet);
+        log.debug("positionSaved: %s", positionSaved);
+        log.debug("positionStep: %s", positionStep);
+        log.debug("tradeSize: %s", tradeSize);
     }
 
-    private double getStep(double totalInPaymentCurrency) {
-        long durationSecs = getDuration().getSeconds();
-        double tickPeriodSecs = frequency.getMins() * 60;
-        double numberOfTicks = durationSecs / tickPeriodSecs;
-        return totalInPaymentCurrency / numberOfTicks;
+    private double getTradeSize() {
+        long tradeNextEpoch = Long.parseLong(storage.getOrDefault(KEY_TRADE_NEXT_EPOCH, now.toEpochSecond()).toString());
+        double tradeNextAmount = Double.parseDouble(storage.getOrDefault(KEY_TRADE_NEXT_AMOUNT, tradeMin).toString());
+        if (tradeNextEpoch < now.toEpochSecond()) {
+            tradeNextAmount = tradeNextAmount / 2;
+            storage.put(KEY_TRADE_NEXT_EPOCH, String.valueOf(now.plusDays(1).toEpochSecond()));
+            storage.put(KEY_TRADE_NEXT_AMOUNT, String.valueOf(tradeNextAmount));
+        }
+        if (tradeNextAmount < tradeMin) {
+            tradeNextAmount = tradeMin;
+        }
+        return tradeNextAmount;
+    }
+
+    private double getPositionStep(double total) {
+        double numberOfTicksPerDay = 60 * 24 / frequency.getMins();
+        return total / period / numberOfTicksPerDay;
     }
 
     @Override
@@ -205,27 +131,5 @@ public class ValueAverigingMinMax extends StrategyScript {
 
         return exchangePair;
     }
-
-    @StrategyParam(
-            name = @LocalizedText(language = Language.EN, text = "Behaviour"),
-            description = @LocalizedText(language = Language.EN, text = "Behaviour time frame"),
-            index = 1)
-    public Behaviour defineBehaviour(Behaviour behaviour) {
-        if (behaviour == null) {
-            behaviour = Behaviour.NORMAL;
-        }
-        this.behaviour = behaviour;
-
-        return behaviour;
-    }
-
-    public static class PriceComparator implements Comparator {
-
-        @Override
-        public int compare(Object o1, Object o2) {
-            TimestampPrice a = (TimestampPrice) o1;
-            TimestampPrice b = (TimestampPrice) o2;
-            return a.getAsk().compareTo(b.getAsk());
-        }
-    }
 }
+

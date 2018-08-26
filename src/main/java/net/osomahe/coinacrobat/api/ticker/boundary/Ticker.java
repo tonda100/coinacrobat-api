@@ -61,6 +61,16 @@ public interface Ticker {
     TimestampPrice getMaximumAsk(ExchangePair exchangePair, ZonedDateTime from);
 
     /**
+     * Method for receiving maximum ask price for given exchange pair between given from and to.
+     *
+     * @param exchangePair exchange pair which prices you need to receive
+     * @param from the from border of search
+     * @param to the to border of search
+     * @return TimestampPrice with maximum ask value
+     */
+    TimestampPrice getMaximumAsk(ExchangePair exchangePair, ZonedDateTime from, ZonedDateTime to);
+
+    /**
      * Method for receiving maximum bid price for given exchange pair between given from and now.
      *
      * @param exchangePair exchange pair which prices you need to receive
@@ -68,6 +78,16 @@ public interface Ticker {
      * @return TimestampPrice with maximum bid value
      */
     TimestampPrice getMaximumBid(ExchangePair exchangePair, ZonedDateTime from);
+
+    /**
+     * Method for receiving maximum bid price for given exchange pair between given from and to.
+     *
+     * @param exchangePair exchange pair which prices you need to receive
+     * @param from the from border of search
+     * @param to the to border of search
+     * @return TimestampPrice with maximum bid value
+     */
+    TimestampPrice getMaximumBid(ExchangePair exchangePair, ZonedDateTime from, ZonedDateTime to);
 
     /**
      * Method for receiving minimum ask price for given exchange pair between given from and now.
@@ -79,6 +99,16 @@ public interface Ticker {
     TimestampPrice getMinimumAsk(ExchangePair exchangePair, ZonedDateTime from);
 
     /**
+     * Method for receiving minimum ask price for given exchange pair between given from and to.
+     *
+     * @param exchangePair exchange pair which prices you need to receive
+     * @param from the from border of search
+     * @param to the to border of search
+     * @return TimestampPrice with minimum ask value
+     */
+    TimestampPrice getMinimumAsk(ExchangePair exchangePair, ZonedDateTime from, ZonedDateTime to);
+
+    /**
      * Method for receiving minimum bid price for given exchange pair between given from and now.
      *
      * @param exchangePair exchange pair which prices you need to receive
@@ -86,6 +116,16 @@ public interface Ticker {
      * @return TimestampPrice with minimum bid value
      */
     TimestampPrice getMinimumBid(ExchangePair exchangePair, ZonedDateTime from);
+
+    /**
+     * Method for receiving minimum bid price for given exchange pair between given from and to.
+     *
+     * @param exchangePair exchange pair which prices you need to receive
+     * @param from the from border of search
+     * @param to the to border of search
+     * @return TimestampPrice with minimum bid value
+     */
+    TimestampPrice getMinimumBid(ExchangePair exchangePair, ZonedDateTime from, ZonedDateTime to);
 
     /**
      * Method for receiving average ask price for given exchange pair between given from and now.
@@ -97,6 +137,16 @@ public interface Ticker {
     Double getAverageAsk(ExchangePair exchangePair, ZonedDateTime from);
 
     /**
+     * Method for receiving average ask price for given exchange pair between given from and to.
+     *
+     * @param exchangePair exchange pair which prices you need to receive
+     * @param from the from border of search
+     * @param to the to border of search
+     * @return average ask price for period
+     */
+    Double getAverageAsk(ExchangePair exchangePair, ZonedDateTime from, ZonedDateTime to);
+
+    /**
      * Method for receiving average bid price for given exchange pair between given from and now.
      *
      * @param exchangePair exchange pair which prices you need to receive
@@ -104,4 +154,52 @@ public interface Ticker {
      * @return average bid price for period
      */
     Double getAverageBid(ExchangePair exchangePair, ZonedDateTime from);
+
+    /**
+     * Method for receiving average bid price for given exchange pair between given from and to.
+     *
+     * @param exchangePair exchange pair which prices you need to receive
+     * @param from the from border of search
+     * @param to the to border of search
+     * @return average bid price for period
+     */
+    Double getAverageBid(ExchangePair exchangePair, ZonedDateTime from, ZonedDateTime to);
+
+    /**
+     * Method for receiving standard deviation of ask price for given exchange pair between given from and now.
+     *
+     * @param exchangePair exchange pair which prices you need to receive
+     * @param from the from border of search
+     * @return average bid price for period
+     */
+    Double getStandardDeviationAsk(ExchangePair exchangePair, ZonedDateTime from);
+
+    /**
+     * Method for receiving standard deviation of ask price for given exchange pair between given from and to.
+     *
+     * @param exchangePair exchange pair which prices you need to receive
+     * @param from the from border of search
+     * @param to the to border of search
+     * @return average bid price for period
+     */
+    Double getStandardDeviationAsk(ExchangePair exchangePair, ZonedDateTime from, ZonedDateTime to);
+
+    /**
+     * Method for receiving standard deviation of bid price for given exchange pair between given from and now.
+     *
+     * @param exchangePair exchange pair which prices you need to receive
+     * @param from the from border of search
+     * @return average bid price for period
+     */
+    Double getStandardDeviationBid(ExchangePair exchangePair, ZonedDateTime from);
+
+    /**
+     * Method for receiving standard deviation of bid price for given exchange pair between given from and to.
+     *
+     * @param exchangePair exchange pair which prices you need to receive
+     * @param from the from border of search
+     * @param to the to border of search
+     * @return average bid price for period
+     */
+    Double getStandardDeviationBid(ExchangePair exchangePair, ZonedDateTime from, ZonedDateTime to);
 }

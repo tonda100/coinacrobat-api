@@ -7,6 +7,7 @@ import net.osomahe.coinacrobat.api.exchange.boundary.Trader;
 import net.osomahe.coinacrobat.api.exchange.boundary.Wallet;
 import net.osomahe.coinacrobat.api.graph.boundary.Graphs;
 import net.osomahe.coinacrobat.api.logger.boundary.Logger;
+import net.osomahe.coinacrobat.api.predictions.boundary.Predictions;
 import net.osomahe.coinacrobat.api.strategy.entity.StrategyFrequency;
 import net.osomahe.coinacrobat.api.ticker.boundary.Ticker;
 
@@ -22,7 +23,7 @@ public abstract class StrategyScript {
     protected StrategyFrequency frequency;
 
     // storage which survives the ticks
-    protected Map storage;
+    protected Map<String, String> storage;
 
     // buy and selling commodity
     protected Trader trader;
@@ -38,6 +39,8 @@ public abstract class StrategyScript {
 
     // graph drawing
     protected Graphs graphs;
+
+    protected Predictions predictions;
 
     protected ZonedDateTime now = ZonedDateTime.now();
 
@@ -61,7 +64,7 @@ public abstract class StrategyScript {
         this.now = now;
     }
 
-    public void setStorage(Map storage) {
+    public void setStorage(Map<String, String> storage) {
         this.storage = storage;
     }
 
@@ -87,5 +90,9 @@ public abstract class StrategyScript {
 
     public void setFrequency(StrategyFrequency frequency) {
         this.frequency = frequency;
+    }
+
+    public void setPredictions(Predictions predictions) {
+        this.predictions = predictions;
     }
 }

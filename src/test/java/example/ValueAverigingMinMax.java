@@ -49,7 +49,7 @@ public class ValueAverigingMinMax extends StrategyScript {
         double total = usd + btcInUsd;
         double percentageWallet = btcInUsd / total;
 
-        double positionSaved = Double.valueOf(storage.getOrDefault(KEY_POSITION, btcInUsd).toString());
+        double positionSaved = Double.valueOf(storage.getOrDefault(KEY_POSITION, String.valueOf(btcInUsd)));
         double positionStep = getPositionStep(total);
         if (percentageNow > percentageWallet) {
             storage.put(KEY_POSITION, String.valueOf(positionSaved + positionStep));
@@ -96,8 +96,8 @@ public class ValueAverigingMinMax extends StrategyScript {
     }
 
     private double getTradeSize() {
-        long tradeNextEpoch = Long.parseLong(storage.getOrDefault(KEY_TRADE_NEXT_EPOCH, now.toEpochSecond()).toString());
-        double tradeNextAmount = Double.parseDouble(storage.getOrDefault(KEY_TRADE_NEXT_AMOUNT, tradeMin).toString());
+        long tradeNextEpoch = Long.parseLong(storage.getOrDefault(KEY_TRADE_NEXT_EPOCH, String.valueOf(now.toEpochSecond())));
+        double tradeNextAmount = Double.parseDouble(storage.getOrDefault(KEY_TRADE_NEXT_AMOUNT, String.valueOf(tradeMin)));
         if (tradeNextEpoch < now.toEpochSecond()) {
             tradeNextAmount = tradeNextAmount / 2;
             storage.put(KEY_TRADE_NEXT_EPOCH, String.valueOf(now.plusDays(1).toEpochSecond()));

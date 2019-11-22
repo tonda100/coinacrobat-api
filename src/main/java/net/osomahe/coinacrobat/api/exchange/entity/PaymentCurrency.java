@@ -23,11 +23,4 @@ public enum PaymentCurrency implements Asset {
     public String getCode() {
         return code;
     }
-
-    @Override
-    public String toString() {
-        return "PaymentCurrency{" +
-                "code='" + code + '\'' +
-                "} " + super.toString();
-    }
 }

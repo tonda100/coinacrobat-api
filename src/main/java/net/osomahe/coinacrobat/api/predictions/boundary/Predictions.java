@@ -15,4 +15,8 @@ public interface Predictions {
 
     FutureDirection getImagePipelinePrediction(ExchangePair exchangePair);
 
+    FutureDirection getImagePipelinePrediction(ExchangePair exchangePair, String modelName, Integer periodMin);
+
+    FutureDirection getImagePipelinePrediction(ExchangePair exchangePair, Integer periodMin);
+
 }

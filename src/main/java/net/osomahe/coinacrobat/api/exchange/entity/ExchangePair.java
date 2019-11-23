@@ -1,6 +1,10 @@
 package net.osomahe.coinacrobat.api.exchange.entity;
 
 
+import java.util.HashSet;
+import java.util.Set;
+
+
 /**
  * Enumeration of all possible combinations of {@link Commodity} and {@link PaymentCurrency}.
  *
@@ -61,6 +65,15 @@ public enum ExchangePair {
         return paymentPrecision;
     }
 
+    public static boolean exists(String code) {
+        for (ExchangePair ep : ExchangePair.values()) {
+            if (code.equals(ep.getCode())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static ExchangePair valueFromCode(String code) {
         for (ExchangePair ep : ExchangePair.values()) {
             if (code.equals(ep.getCode())) {
@@ -68,5 +81,15 @@ public enum ExchangePair {
             }
         }
         throw new IllegalArgumentException("Cannot find ExchangePair for code: " + code);
+    }
+
+    public static Set<ExchangePair> valuesForPaymentCurrency(PaymentCurrency paymentCurrency) {
+        Set<ExchangePair> results = new HashSet<>();
+        for (ExchangePair ep : ExchangePair.values()) {
+            if (paymentCurrency == ep.paymentCurrency) {
+                results.add(ep);
+            }
+        }
+        return results;
     }
 }

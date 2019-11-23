@@ -5,6 +5,7 @@ import java.util.TreeSet;
 
 import net.osomahe.coinacrobat.api.exchange.entity.ExchangePair;
 import net.osomahe.coinacrobat.api.ticker.entity.Price;
+import net.osomahe.coinacrobat.api.ticker.entity.TechnicalAnalysis;
 import net.osomahe.coinacrobat.api.ticker.entity.TimestampPrice;
 
 
@@ -202,4 +203,14 @@ public interface Ticker {
      * @return average bid price for period
      */
     Double getStandardDeviationBid(ExchangePair exchangePair, ZonedDateTime from, ZonedDateTime to);
+
+    /**
+     * Method for receiving technical analysis data for given exchange pair and time and with give precision count.
+     *
+     * @param exchangePair exchange pair which prices you need to receive
+     * @param dateTime time to which is data related
+     * @param count how many previous data is take to computation
+     * @return object of technical analysis
+     */
+    TechnicalAnalysis getTechnicalAnalysis(ExchangePair exchangePair, ZonedDateTime dateTime, Integer count);
 }

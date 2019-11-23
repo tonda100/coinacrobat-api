@@ -6,7 +6,7 @@
 
     <groupId>net.osomahe</groupId>
     <artifactId>coinacrobat-api</artifactId>
-    <version>0.3.0-SNAPSHOT</version>
+    <version>0.3.0</version>
     <packaging>jar</packaging>
 
     <name>Coin Acrobat API</name>

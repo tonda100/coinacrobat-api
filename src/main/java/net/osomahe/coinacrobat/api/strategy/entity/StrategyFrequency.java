@@ -7,7 +7,7 @@ package net.osomahe.coinacrobat.api.strategy.entity;
  */
 public enum StrategyFrequency {
 
-    MINUTE(1), HOUR(60), DAY(60 * 24);
+    MINUTE(1), HOUR(60), DAY(60 * 24), HOURS12(60 * 12), HOURS8(60 * 8), HOURS6(60 * 6), HOURS4(60 * 4);
 
     private long mins;
 

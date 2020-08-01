@@ -12,6 +12,10 @@ public class Price {
 
     private ZonedDateTime timestamp;
 
+    public Double getAverage() {
+        return (ask + bid) / 2;
+    }
+
     public ExchangePair getExchangePair() {
         return exchangePair;
     }

@@ -1,7 +1,7 @@
 package net.osomahe.coinacrobat.api;
 
-import java.time.Period;
 import java.time.ZonedDateTime;
+import java.time.temporal.TemporalAmount;
 import java.util.List;
 import java.util.Map;
 
@@ -152,35 +152,35 @@ public abstract class StrategyScript {
         return null;
     }
 
-    protected final Price getMaximum(ExchangePair exchangePair, Period period) {
+    protected final Price getMaximum(ExchangePair exchangePair, TemporalAmount temporalAmount) {
         return null;
     }
 
-    protected final Price getMaximum(String exchangePairCode, Period period) {
+    protected final Price getMaximum(String exchangePairCode, TemporalAmount temporalAmount) {
         return null;
     }
 
-    protected final Price getMinimum(ExchangePair exchangePair, Period period) {
+    protected final Price getMinimum(ExchangePair exchangePair, TemporalAmount temporalAmount) {
         return null;
     }
 
-    protected final Price getMinimum(String exchangePairCode, Period period) {
+    protected final Price getMinimum(String exchangePairCode, TemporalAmount temporalAmount) {
         return null;
     }
 
-    protected final Double getAverage(ExchangePair exchangePair, Period period) {
+    protected final Double getAverage(ExchangePair exchangePair, TemporalAmount temporalAmount) {
         return null;
     }
 
-    protected final Double getAverage(String exchangePairCode, Period period) {
+    protected final Double getAverage(String exchangePairCode, TemporalAmount temporalAmount) {
         return null;
     }
 
-    protected final Double getStandardDeviation(ExchangePair exchangePair, Period period) {
+    protected final Double getStandardDeviation(ExchangePair exchangePair, TemporalAmount temporalAmount) {
         return null;
     }
 
-    protected final Double getStandardDeviation(String exchangePairCode, Period period) {
+    protected final Double getStandardDeviation(String exchangePairCode, TemporalAmount temporalAmount) {
         return null;
     }
 
@@ -207,12 +207,12 @@ public abstract class StrategyScript {
     }
 
 
-    protected final Double getPercentile(ExchangePair exchangePair, Period period, Double percentile) {
+    protected final Double getPercentile(ExchangePair exchangePair, TemporalAmount temporalAmount, Double percentile) {
         return null;
     }
 
 
-    protected final Double getPercentile(String exchangePairCode, Period period, Double percentile) {
+    protected final Double getPercentile(String exchangePairCode, TemporalAmount temporalAmount, Double percentile) {
         return null;
     }
 }

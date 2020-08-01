@@ -16,7 +16,9 @@ public class DailyStrategy extends StrategyScript {
         getMaximum(exchangePair, Period.ofYears(1));
 
         List<Currency> values = getCatalogValues(Currency.class);
-        
+
+        PaymentCurrency a = PaymentCurrency.of("abc");
+
     }
 
     @StrategyParam(

@@ -7,7 +7,7 @@ import java.util.Map;
 
 public abstract class StrategyScript {
 
-    private ZonedDateTime now;
+    protected ZonedDateTime now;
 
     // frequency of strategy ticks
     protected StrategyFrequency frequency;

@@ -2,10 +2,21 @@ package net.osomahe.coinacrobat.api;
 
 import java.time.Period;
 import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.Map;
 
 public abstract class StrategyScript {
 
     private ZonedDateTime now;
+
+    // frequency of strategy ticks
+    protected StrategyFrequency frequency;
+
+    // storage which survives the ticks
+    protected Map<String, String> storage;
+
+    // account balances
+    protected Wallet wallet;
 
     protected abstract void tick();
 
@@ -20,6 +31,11 @@ public abstract class StrategyScript {
     }
 
     protected final TradeBuilder.Receive receive(Amount amount) {
+        return null;
+    }
+
+
+    protected <T extends Catalogable> List<T> getCatalogValues(Class<T> tClass) {
         return null;
     }
 

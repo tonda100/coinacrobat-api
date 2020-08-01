@@ -1,6 +1,7 @@
 package net.osomahe.coinacrobat.api;
 
 import java.time.Period;
+import java.util.List;
 
 public class DailyStrategy extends StrategyScript {
 
@@ -13,6 +14,9 @@ public class DailyStrategy extends StrategyScript {
         receive(1000, "xrp").from("usd").withNote("akoy");
 
         getMaximum(exchangePair, Period.ofYears(1));
+
+        List<Currency> values = getCatalogValues(Currency.class);
+        
     }
 
     @StrategyParam(

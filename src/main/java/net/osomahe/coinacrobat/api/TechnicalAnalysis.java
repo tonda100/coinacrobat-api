@@ -1,7 +1,6 @@
-package net.osomahe.coinacrobat.api.ticker.entity;
+package net.osomahe.coinacrobat.api;
 
 import java.util.StringJoiner;
-
 
 /**
  * Technical analysis indicators "Relative Strength Index", "Chande Momentum Oscillator" and "Triple Exponential Average"

@@ -1,7 +1,7 @@
-package net.osomahe.coinacrobat.api.strategy.entity;
+package net.osomahe.coinacrobat.api;
 
 /**
- * Pissible strategy frequency values with information about minutes duration.
+ * Possible strategy frequency values with information about minutes duration.
  *
  * @author Antonin Stoklasek
  */

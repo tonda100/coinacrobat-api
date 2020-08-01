@@ -1,4 +1,4 @@
-package net.osomahe.coinacrobat.api.logger.entity;
+package net.osomahe.coinacrobat.api;
 
 /**
  * Enumeration of all possible log levels.

@@ -1,4 +1,4 @@
-package net.osomahe.coinacrobat.api;
+package net.osomahe.coinacrobat.smartapi.trade;
 
 public class TradeException extends RuntimeException {
 }

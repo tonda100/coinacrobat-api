@@ -1,9 +1,13 @@
-package net.osomahe.coinacrobat.api;
+package net.osomahe.coinacrobat.smartapi;
+
+import net.osomahe.coinacrobat.smartapi.catalog.Currency;
+import net.osomahe.coinacrobat.smartapi.catalog.ExchangePair;
+import net.osomahe.coinacrobat.smartapi.catalog.PaymentCurrency;
 
 import java.time.Period;
 import java.util.List;
 
-public class DailyStrategy extends StrategyScript {
+public class DailyStrategy extends SmartStrategyScript {
 
     private ExchangePair exchangePair;
 

@@ -1,4 +1,4 @@
-package net.osomahe.coinacrobat.api;
+package net.osomahe.coinacrobat.smartapi;
 
 /**
  * Possible strategy frequency values with information about minutes duration.

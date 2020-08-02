@@ -1,11 +1,25 @@
-package net.osomahe.coinacrobat.api;
+package net.osomahe.coinacrobat.smartapi;
+
+import net.osomahe.coinacrobat.smartapi.catalog.CatalogService;
+import net.osomahe.coinacrobat.smartapi.catalog.Catalogable;
+import net.osomahe.coinacrobat.smartapi.catalog.Currency;
+import net.osomahe.coinacrobat.smartapi.catalog.ExchangePair;
+import net.osomahe.coinacrobat.smartapi.price.Price;
+import net.osomahe.coinacrobat.smartapi.price.PriceRequest;
+import net.osomahe.coinacrobat.smartapi.price.PriceService;
+import net.osomahe.coinacrobat.smartapi.price.TechnicalAnalysis;
+import net.osomahe.coinacrobat.smartapi.trade.TradeBuilder;
+import net.osomahe.coinacrobat.smartapi.trade.TradeRequest;
+import net.osomahe.coinacrobat.smartapi.trade.Transaction;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.TemporalAmount;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-public abstract class StrategyScript {
+public abstract class SmartStrategyScript {
 
     protected ZonedDateTime now;
 
@@ -18,25 +32,48 @@ public abstract class StrategyScript {
     // account balances
     protected Wallet wallet;
 
+    private PriceService servicePrice;
+
+    private CatalogService serviceCatalog;
+
+    private boolean caching;
+
+    private List<LogRecord> resultLogs = new ArrayList<>();
+
+    private List<GraphRecord> resultGraphs = new ArrayList<>();
+
+    private List<Transaction> resultTransactions = new ArrayList<>();
+
+    protected SmartStrategyScript() {
+    }
+
     protected abstract void tick();
 
-    public final TickResult proceedTick(ZonedDateTime now) {
-        this.now = now;
+    public final TickResult proceedTick() {
         tick();
-        return new TickResult();
+        return new TickResult.Builder()
+                .withNow(now)
+                .withFrequency(frequency)
+                .withStorage(storage)
+                .withWallet(wallet)
+                .withLogs(resultLogs)
+                .withGraphs(resultGraphs)
+                .withTransactions(resultTransactions.stream().filter(Transaction::isProcessed).collect(Collectors.toList()))
+                .build();
     }
 
     protected final TradeBuilder.Sell sell(Amount amount) {
-        return null;
+        TradeRequest tradeRequest = new TradeRequest(now, wallet, caching);
+        return new TradeBuilder.Sell(amount, servicePrice, tradeRequest, resultTransactions);
     }
 
     protected final TradeBuilder.Receive receive(Amount amount) {
-        return null;
+        return new TradeBuilder.Receive(amount);
     }
 
 
     protected <T extends Catalogable> List<T> getCatalogValues(Class<T> tClass) {
-        return null;
+        return serviceCatalog.getCatalogValues(tClass);
     }
 
     /**
@@ -47,7 +84,7 @@ public abstract class StrategyScript {
      * @param params parameters of the message
      */
     protected final void log(LogLevel level, String msg, Object... params) {
-
+        resultLogs.add(new LogRecord(level, String.format(msg, params)));
     }
 
     /**
@@ -57,7 +94,7 @@ public abstract class StrategyScript {
      * @param value     to be plotted
      */
     public final void plot(String graphName, Double value) {
-
+        resultGraphs.add(new GraphRecord(graphName, value));
     }
 
     protected final TradeBuilder.Sell sell(Integer amount, Currency currency) {
@@ -139,7 +176,7 @@ public abstract class StrategyScript {
      * @return current price of given exchange pair
      */
     protected final Price getPrice(ExchangePair exchangePair) {
-        return null;
+        return getPrice(exchangePair.getCode());
     }
 
     /**
@@ -149,39 +186,78 @@ public abstract class StrategyScript {
      * @return current price of given exchange pair
      */
     protected final Price getPrice(String exchangePairCode) {
-        return null;
+        return servicePrice.getPrice(
+                new PriceRequest.Builder()
+                        .withExchangePair(exchangePairCode)
+                        .withTimestamp(now)
+                        .withCaching(caching)
+                        .withWallet(wallet)
+                        .build()
+        );
     }
 
     protected final Price getMaximum(ExchangePair exchangePair, TemporalAmount temporalAmount) {
-        return null;
+        return getMaximum(exchangePair.getCode(), temporalAmount);
     }
 
     protected final Price getMaximum(String exchangePairCode, TemporalAmount temporalAmount) {
-        return null;
+        return servicePrice.getMaximum(
+                new PriceRequest.Builder()
+                        .withExchangePair(exchangePairCode)
+                        .withTimestamp(now)
+                        .withCaching(caching)
+                        .withWallet(wallet)
+                        .build(),
+                temporalAmount
+        );
     }
 
     protected final Price getMinimum(ExchangePair exchangePair, TemporalAmount temporalAmount) {
-        return null;
+        return getMinimum(exchangePair.getCode(), temporalAmount);
     }
 
     protected final Price getMinimum(String exchangePairCode, TemporalAmount temporalAmount) {
-        return null;
+        return servicePrice.getMinimum(
+                new PriceRequest.Builder()
+                        .withExchangePair(exchangePairCode)
+                        .withTimestamp(now)
+                        .withCaching(caching)
+                        .withWallet(wallet)
+                        .build(),
+                temporalAmount
+        );
     }
 
-    protected final Double getAverage(ExchangePair exchangePair, TemporalAmount temporalAmount) {
-        return null;
+    protected final Price getAverage(ExchangePair exchangePair, TemporalAmount temporalAmount) {
+        return getAverage(exchangePair.getCode(), temporalAmount);
     }
 
-    protected final Double getAverage(String exchangePairCode, TemporalAmount temporalAmount) {
-        return null;
+    protected final Price getAverage(String exchangePairCode, TemporalAmount temporalAmount) {
+        return servicePrice.getAverage(
+                new PriceRequest.Builder()
+                        .withExchangePair(exchangePairCode)
+                        .withTimestamp(now)
+                        .withCaching(caching)
+                        .withWallet(wallet)
+                        .build(),
+                temporalAmount
+        );
     }
 
-    protected final Double getStandardDeviation(ExchangePair exchangePair, TemporalAmount temporalAmount) {
-        return null;
+    protected final Price getStandardDeviation(ExchangePair exchangePair, TemporalAmount temporalAmount) {
+        return getStandardDeviation(exchangePair.getCode(), temporalAmount);
     }
 
-    protected final Double getStandardDeviation(String exchangePairCode, TemporalAmount temporalAmount) {
-        return null;
+    protected final Price getStandardDeviation(String exchangePairCode, TemporalAmount temporalAmount) {
+        return servicePrice.getStandardDeviation(
+                new PriceRequest.Builder()
+                        .withExchangePair(exchangePairCode)
+                        .withTimestamp(now)
+                        .withCaching(caching)
+                        .withWallet(wallet)
+                        .build(),
+                temporalAmount
+        );
     }
 
     /**
@@ -192,7 +268,7 @@ public abstract class StrategyScript {
      * @return object of technical analysis
      */
     protected final TechnicalAnalysis getTechnicalAnalysis(ExchangePair exchangePair, Integer count) {
-        return null;
+        return getTechnicalAnalysis(exchangePair.getCode(), count);
     }
 
     /**
@@ -203,16 +279,24 @@ public abstract class StrategyScript {
      * @return object of technical analysis
      */
     protected final TechnicalAnalysis getTechnicalAnalysis(String exchangePairCode, Integer count) {
+        return servicePrice.getTechnicalAnalysis(
+                new PriceRequest.Builder()
+                        .withExchangePair(exchangePairCode)
+                        .withTimestamp(now)
+                        .withCaching(caching)
+                        .withWallet(wallet)
+                        .build(),
+                count
+        );
+    }
+
+
+    protected final Price getPercentile(ExchangePair exchangePair, TemporalAmount temporalAmount, Double percentile) {
         return null;
     }
 
 
-    protected final Double getPercentile(ExchangePair exchangePair, TemporalAmount temporalAmount, Double percentile) {
-        return null;
-    }
-
-
-    protected final Double getPercentile(String exchangePairCode, TemporalAmount temporalAmount, Double percentile) {
+    protected final Price getPercentile(String exchangePairCode, TemporalAmount temporalAmount, Double percentile) {
         return null;
     }
 }

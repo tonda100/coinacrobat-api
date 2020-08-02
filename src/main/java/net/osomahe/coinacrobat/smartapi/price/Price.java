@@ -1,4 +1,6 @@
-package net.osomahe.coinacrobat.api;
+package net.osomahe.coinacrobat.smartapi.price;
+
+import net.osomahe.coinacrobat.smartapi.catalog.ExchangePair;
 
 import java.time.ZonedDateTime;
 

@@ -1,5 +1,8 @@
-package net.osomahe.coinacrobat.api;
+package net.osomahe.coinacrobat.smartapi;
 
+
+import net.osomahe.coinacrobat.smartapi.catalog.Currency;
+import net.osomahe.coinacrobat.smartapi.catalog.ExchangePair;
 
 /**
  * This interface represents stock market wallet.

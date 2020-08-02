@@ -14,7 +14,7 @@ public enum ExchangePair {
     BTC_USD(Commodity.BTC, 8, PaymentCurrency.USD, 2),
     BTC_EUR(Commodity.BTC, 8, PaymentCurrency.EUR, 2),
     BTC_GBP(Commodity.BTC, 8, PaymentCurrency.GBP, 2),
-    BTC_PAX(Commodity.BTC, 8, PaymentCurrency.GBP, 2),
+    BTC_PAX(Commodity.BTC, 8, PaymentCurrency.PAX, 2),
 
     GBP_USD(Commodity.GBP, 5, PaymentCurrency.USD, 5),
     GBP_EUR(Commodity.GBP, 5, PaymentCurrency.EUR, 5),

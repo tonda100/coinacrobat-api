@@ -13,19 +13,43 @@ import java.util.Set;
 public enum ExchangePair {
     BTC_USD(Commodity.BTC, 8, PaymentCurrency.USD, 2),
     BTC_EUR(Commodity.BTC, 8, PaymentCurrency.EUR, 2),
+    BTC_GBP(Commodity.BTC, 8, PaymentCurrency.GBP, 2),
+    BTC_PAX(Commodity.BTC, 8, PaymentCurrency.GBP, 2),
+
+    GBP_USD(Commodity.GBP, 5, PaymentCurrency.USD, 5),
+    GBP_EUR(Commodity.GBP, 5, PaymentCurrency.EUR, 5),
     EUR_USD(Commodity.EUR, 5, PaymentCurrency.USD, 5),
+
     XRP_USD(Commodity.XRP, 8, PaymentCurrency.USD, 5),
     XRP_EUR(Commodity.XRP, 8, PaymentCurrency.EUR, 5),
     XRP_BTC(Commodity.XRP, 8, PaymentCurrency.BTC, 8),
+    XRP_GBP(Commodity.XRP, 8, PaymentCurrency.GBP, 5),
+    XRP_PAX(Commodity.XRP, 8, PaymentCurrency.PAX, 5),
+
     LTC_USD(Commodity.LTC, 8, PaymentCurrency.USD, 2),
     LTC_EUR(Commodity.LTC, 8, PaymentCurrency.EUR, 2),
     LTC_BTC(Commodity.LTC, 8, PaymentCurrency.BTC, 8),
+    LTC_GBP(Commodity.LTC, 8, PaymentCurrency.GBP, 2),
+
     ETH_USD(Commodity.ETH, 8, PaymentCurrency.USD, 2),
     ETH_EUR(Commodity.ETH, 8, PaymentCurrency.EUR, 2),
     ETH_BTC(Commodity.ETH, 8, PaymentCurrency.BTC, 8),
+    ETH_GBP(Commodity.ETH, 8, PaymentCurrency.GBP, 2),
+    ETH_PAX(Commodity.ETH, 8, PaymentCurrency.PAX, 2),
+
     BCH_USD(Commodity.BCH, 8, PaymentCurrency.USD, 2),
     BCH_EUR(Commodity.BCH, 8, PaymentCurrency.EUR, 2),
-    BCH_BTC(Commodity.BCH, 8, PaymentCurrency.BTC, 8);
+    BCH_BTC(Commodity.BCH, 8, PaymentCurrency.BTC, 8),
+    BCH_GBP(Commodity.BCH, 8, PaymentCurrency.GBP, 2),
+
+    PAX_USD(Commodity.PAX, 5, PaymentCurrency.USD, 5),
+    PAX_EUR(Commodity.PAX, 5, PaymentCurrency.EUR, 5),
+    PAX_GBP(Commodity.PAX, 5, PaymentCurrency.GBP, 5),
+
+    XLM_BTC(Commodity.XLM, 8, PaymentCurrency.BTC, 8),
+    XLM_USD(Commodity.XLM, 8, PaymentCurrency.USD, 5),
+    XLM_EUR(Commodity.XLM, 8, PaymentCurrency.EUR, 5),
+    XLM_GBP(Commodity.XLM, 8, PaymentCurrency.GBP, 5);
 
     private Commodity commodity;
 

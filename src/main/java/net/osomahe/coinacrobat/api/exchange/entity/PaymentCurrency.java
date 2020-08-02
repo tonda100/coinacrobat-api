@@ -11,7 +11,9 @@ public enum PaymentCurrency implements Asset {
 
     USD("usd"),
     EUR("eur"),
-    BTC("btc");
+    BTC("btc"),
+    GBP("gbp"),
+    PAX("pax");
 
     private final String code;
 

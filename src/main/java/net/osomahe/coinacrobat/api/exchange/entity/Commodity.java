@@ -13,7 +13,10 @@ public enum Commodity implements Asset {
     LTC("ltc"),
     ETH("eth"),
     BCH("bch"),
-    EUR("eur");
+    EUR("eur"),
+    GBP("gbp"),
+    PAX("pax"),
+    XLM("xlm");
 
     private final String code;
 
